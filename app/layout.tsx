@@ -1,4 +1,3 @@
-// app/layout.tsx
 import "./globals.css";
 import { ReduxProvider } from "@/store/store";
 import Navbar from "@/components/Navbar";

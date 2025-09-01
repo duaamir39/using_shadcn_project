@@ -1,15 +1,18 @@
-import { NextResponse } from "next/server";
+// app/api/product/[productid]/route.ts
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: Request, { params }: { params: { productid: string } }) {
-  const { productid } = params;
+export async function GET(
+  request: NextRequest,
+  context: { params: { productid: string } }
+) {
+  const { productid } = context.params;
 
   try {
     const res = await fetch(`https://fakestoreapi.com/products/${productid}`);
-    if (!res.ok) throw new Error(`Failed to fetch product (status ${res.status})`);
+    if (!res.ok) throw new Error("Failed to fetch product");
     const data = await res.json();
     return NextResponse.json(data);
   } catch (err: any) {
-    console.error("API fetch error:", err);
-    return NextResponse.json({ error: "Failed to fetch product" }, { status: 500 });
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
