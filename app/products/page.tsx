@@ -1,67 +1,66 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
-type Product = {
+interface Product {
   id: number;
-  name: string;
-  description: string;
-  price: string;
-};
+  title: string;
+  price: number;
+  image: string;
+}
 
-const products: Product[] = [
-  {
-    id: 1,
-    name: "Laptop",
-    description: "High performance laptop",
-    price: "Rs 120000",
-  },
-  {
-    id: 2,
-    name: "Smartphone",
-    description: "Latest Android smartphone",
-    price: "Rs 80000",
-  },
-  {
-    id: 3,
-    name: "Headphones",
-    description: "Noise-cancelling headphones",
-    price: "Rs 2200",
-  },
-  {
-    id: 4,
-    name: "Smartwatch",
-    description: "Feature-packed smartwatch",
-    price: "Rs 15000",
-  },
-];
+const USD_TO_PKR = 280; // Conversion rate
 
 export default function ProductsPage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch("https://fakestoreapi.com/products");
+        if (!res.ok) throw new Error("Failed to fetch products");
+        const data = await res.json();
+        setProducts(data);
+      } catch (err: any) {
+        console.error(err);
+        setError("Failed to load products.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
+
+  if (loading) return <p className="text-center mt-8">Loading products...</p>;
+  if (error) return <p className="text-red-500 text-center mt-8">{error}</p>;
+
   return (
-    <div className="p-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <div className="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
       {products.map((product) => (
         <div
           key={product.id}
-          className="p-6 border rounded-xl shadow-md hover:shadow-lg transition bg-white"
+          className="bg-white rounded-2xl shadow-md p-5 flex flex-col hover:shadow-xl transition"
         >
-          <h2 className="text-2xl font-semibold text-gray-800">
-            {product.name}
-          </h2>
-          <p className="text-gray-600 mt-2">{product.description}</p>
-          <p className="mt-4 text-lg font-bold text-green-600">
-            {product.price}
+          <img
+            src={product.image}
+            alt={product.title}
+            className="w-full h-48 object-contain mb-4"
+          />
+          <h2 className="font-semibold text-lg mb-2">{product.title}</h2>
+          <p className="text-green-600 font-bold text-lg mb-4">
+            Rs {(product.price * USD_TO_PKR).toLocaleString()}
           </p>
           <Link
             href={`/products/${product.id}`}
-            className="mt-4 inline-block text-blue-600 hover:underline font-medium"
+            className="mt-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-center font-medium transition"
           >
-            View Details →
+            View Details
           </Link>
         </div>
       ))}
     </div>
   );
-}
-export function generateStaticParams() {
-  return products.map((product) => ({
-    productid: product.id.toString(),
-  }));
 }

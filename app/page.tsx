@@ -1,25 +1,20 @@
 "use client";
 
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-blue-100 via-white to-blue-50 text-center px-6">
-      <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-        Welcome to <span className="text-blue-600">My Store</span>
+    <div className="bg-gradient-to-br from-blue-300 via-white to-pink-200 min-h-screen flex flex-col items-center justify-center">
+      <h1 className="text-5xl font-bold mb-4 text-gray-900 text-center">
+        Welcome to MyShop
       </h1>
-      <p className="text-lg text-gray-600 mb-8 max-w-xl">
-        Discover our amazing collection of tech products — laptops, smartphones,
-        accessories, and more. Find everything you need in one place!
+      <p className="text-lg text-gray-700 text-center mb-6 max-w-xl">
+        Discover amazing products and deals. Browse our collection and find your favorites!
       </p>
-      <Button
-        asChild
-        size="lg"
-        className="rounded-xl px-8 py-6 text-lg shadow-md hover:shadow-lg"
+      <a
+        href="/products"
+        className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition"
       >
-        <Link href="/products">Browse Products →</Link>
-      </Button>
+        Shop Now
+      </a>
     </div>
   );
 }
