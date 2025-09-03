@@ -6,6 +6,7 @@ export interface CartItem {
   price: number;
   image: string;
   quantity: number;
+  category?: string;
 }
 
 interface CartState {
@@ -25,22 +26,28 @@ const cartSlice = createSlice({
       if (existing) {
         existing.quantity += action.payload.quantity;
       } else {
-        state.items.push(action.payload);
+        state.items.push({ ...action.payload });
       }
     },
+
     removeFromCart: (state, action: PayloadAction<number>) => {
       state.items = state.items.filter((item) => item.id !== action.payload);
     },
+
     increaseQuantity: (state, action: PayloadAction<number>) => {
       const item = state.items.find((item) => item.id === action.payload);
-      if (item) item.quantity += 1;
+      if (item) {
+        item.quantity += 1;
+      }
     },
+
     decreaseQuantity: (state, action: PayloadAction<number>) => {
       const item = state.items.find((item) => item.id === action.payload);
       if (item && item.quantity > 1) {
         item.quantity -= 1;
       }
     },
+
     clearCart: (state) => {
       state.items = [];
     },

@@ -4,13 +4,24 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import { clearCart } from "@/store/slices/cartSlice";
 import { useState } from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 
 const USD_TO_PKR = 280;
 
 export default function CheckoutPage() {
   const cartItems = useSelector((state: RootState) => state.cart.items);
   const dispatch = useDispatch();
-  const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const total = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+  const shipping = 9 * USD_TO_PKR;
+  const taxes = 5 * USD_TO_PKR;
+  const grandTotal = total * USD_TO_PKR + shipping + taxes;
   const [orderPlaced, setOrderPlaced] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -21,69 +32,115 @@ export default function CheckoutPage() {
 
   if (orderPlaced) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen text-center bg-gray-100 p-6">
-        <h1 className="text-3xl font-bold mb-4 text-green-600">🎉 Thank you for your order!</h1>
-        <p className="text-gray-700 mb-6">
-          Your order has been placed successfully.
-        </p>
-        <a
-          href="/products"
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition"
-        >
-          Continue Shopping
-        </a>
+      <div className="flex flex-col items-center justify-center min-h-screen text-center p-6">
+        <Card className="p-8 max-w-md mx-auto">
+          <CardHeader>
+            <CardTitle className="text-green-600 text-2xl text-center">
+              🎉 Thank you for your order!
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-700 text-center mb-6">
+              Your order has been placed successfully.
+            </p>
+            <Button asChild className="w-auto">
+              <a href="/products">Continue Shopping</a>
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   return (
-    <div className="p-6 max-w-xl mx-auto bg-white rounded-2xl shadow-lg mt-10">
-      <h1 className="text-2xl font-bold mb-6 text-gray-900">Checkout</h1>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-6 max-w-6xl mx-auto mt-10">
+      <Card>
+        <CardHeader>
+          <CardTitle>Shipping Address</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            <div className="grid grid-cols-2 gap-4">
+              <Input type="text" placeholder="First Name" required />
+              <Input type="text" placeholder="Last Name" required />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <Input type="email" placeholder="Email" required />
+              <Input type="tel" placeholder="Phone Number" required />
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              <Input type="text" placeholder="City" required />
+              <Input type="text" placeholder="State" required />
+              <Input type="text" placeholder="Zip Code" required />
+            </div>
+            <div className="flex-1">
+        <Textarea
+          placeholder="Enter a description..."
+          className="w-full min-h-[180px] resize-none"
+          required
+        />
+      </div>
+          </form>
+        </CardContent>
+      </Card>
 
-      {cartItems.length === 0 ? (
-        <p>Your cart is empty.</p>
-      ) : (
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            placeholder="Full Name"
-            className="w-full px-4 py-2 border rounded"
-            required
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            className="w-full px-4 py-2 border rounded"
-            required
-          />
-          <input
-            type="text"
-            placeholder="Shipping Address"
-            className="w-full px-4 py-2 border rounded"
-            required
-          />
+      <Card>
+        <CardHeader>
+          <CardTitle>Your Cart</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {cartItems.length === 0 ? (
+            <p>Your cart is empty.</p>
+          ) : (
+            <>
+              <div className="space-y-3">
+                {cartItems.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex justify-between items-center"
+                  >
+                    <div>
+                      <p className="font-semibold">{item.title}</p>
+                      <p className="text-sm text-gray-500">
+                        Qty: {item.quantity}
+                      </p>
+                    </div>
+                    <p className="font-medium">
+                      Rs {(item.price * item.quantity * USD_TO_PKR).toLocaleString()}
+                    </p>
+                  </div>
+                ))}
+              </div>
 
-          <h2 className="text-xl font-bold mt-4 text-gray-900">
-            Total: Rs {(total * USD_TO_PKR).toLocaleString()}
-          </h2>
+              <Separator />
 
-          <ul className="mb-4">
-            {cartItems.map((item) => (
-              <li key={item.id} className="flex justify-between border-b py-2">
-                <span>{item.title} x {item.quantity}</span>
-                <span>Rs {(item.price * item.quantity * USD_TO_PKR).toLocaleString()}</span>
-              </li>
-            ))}
-          </ul>
+              <div className="flex justify-between">
+                <p>Subtotal</p>
+                <p>Rs {(total * USD_TO_PKR).toLocaleString()}</p>
+              </div>
+              <div className="flex justify-between">
+                <p>Shipping</p>
+                <p>Rs {shipping.toLocaleString()}</p>
+              </div>
+              <div className="flex justify-between">
+                <p>Estimated Taxes</p>
+                <p>Rs {taxes.toLocaleString()}</p>
+              </div>
 
-          <button
-            type="submit"
-            className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-medium transition"
-          >
-            Place Order
-          </button>
-        </form>
-      )}
+              <Separator />
+
+              <div className="flex justify-between font-bold text-lg">
+                <p>Total</p>
+                <p>Rs {grandTotal.toLocaleString()}</p>
+              </div>
+
+              <Button type="submit" className="w-suto" onClick={handleSubmit}>
+                Place Order
+              </Button>
+            </>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

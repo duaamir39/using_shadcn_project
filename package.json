@@ -11,6 +11,8 @@
   "dependencies": {
     "@netlify/next": "^1.4.9",
     "@netlify/plugin-nextjs": "^5.12.1",
+    "@radix-ui/react-avatar": "^1.1.10",
+    "@radix-ui/react-separator": "^1.1.7",
     "@radix-ui/react-slot": "^1.2.3",
     "@reduxjs/toolkit": "^2.8.2",
     "class-variance-authority": "^0.7.1",

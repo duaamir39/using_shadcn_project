@@ -8,7 +8,23 @@ import {
   decreaseQuantity,
 } from "@/store/slices/cartSlice";
 import Link from "next/link";
-const USD_TO_PKR = 280; 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import {
+  Avatar,
+  AvatarImage,
+  AvatarFallback,
+} from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
+
+const USD_TO_PKR = 280;
 
 export default function CartPage() {
   const cartItems = useSelector((state: RootState) => state.cart.items);
@@ -17,74 +33,101 @@ export default function CartPage() {
 
   if (cartItems.length === 0) {
     return (
-      <div className="p-6 text-center">
-        <p className="mb-4 text-lg">Your cart is empty.</p>
-        <Link
-          href="/products"
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700"
-        >
-          Browse Products
-        </Link>
+      <div className="p-6 text-center space-y-4">
+        <p className="text-lg">Your cart is empty.</p>
+        <Button asChild>
+          <Link href="/products">Browse Products</Link>
+        </Button>
       </div>
     );
   }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-4">
-      <h1 className="text-2xl font-bold mb-4">Your Cart</h1>
-      {cartItems.map((item) => (
-        <div
-          key={item.id}
-          className="flex items-center justify-between border p-4 rounded-lg"
-        >
-          <div className="flex items-center space-x-4">
-            <img
-              src={item.image}
-              alt={item.title}
-              className="w-16 h-16 object-cover rounded"
-            />
-            <div>
-              <h2 className="font-semibold">{item.title}</h2>
- <p className="text-green-600 font-bold">
-                  Rs {(item.price * USD_TO_PKR).toLocaleString()}
-                </p>            </div>
-          </div>
+    <div className="p-6 max-w-5xl mx-auto space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">Shopping Cart</h1>
+        <p className="text-gray-600">{cartItems.length} Items</p>
+      </div>
 
-          <div className="flex items-center space-x-3">
-            <button
-              className="px-3 py-1 bg-gray-300 rounded"
-              onClick={() => dispatch(decreaseQuantity(item.id))}
-            >
-              -
-            </button>
-            <span>{item.quantity}</span>
-            <button
-              className="px-3 py-1 bg-gray-300 rounded"
-              onClick={() => dispatch(increaseQuantity(item.id))}
-            >
-              +
-            </button>
-          </div>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-1/2">Product Details</TableHead>
+            <TableHead className="text-center">Quantity</TableHead>
+            <TableHead className="text-center">Price</TableHead>
+            <TableHead className="text-center">Total</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {cartItems.map((item) => (
+            <TableRow key={item.id}>
+              <TableCell>
+                <div className="flex items-center gap-4">
+                  <Avatar className="w-16 h-16">
+                    <AvatarImage src={item.image} alt={item.title} />
+                    <AvatarFallback>{item.title.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h2 className="font-semibold">{item.title}</h2>
+                    <p className="text-sm text-gray-500">{item.category || "Product"}</p>
+                    <Button
+                      variant="link"
+                      className="text-red-500 px-0"
+                      onClick={() => dispatch(removeFromCart(item.id))}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                </div>
+              </TableCell>
 
-          <button
-            className="px-4 py-2 bg-red-500 text-white rounded"
-            onClick={() => dispatch(removeFromCart(item.id))}
-          >
-            Remove
-          </button>
+              <TableCell className="text-center">
+                <div className="flex items-center justify-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => dispatch(decreaseQuantity(item.id))}
+                  >
+                    -
+                  </Button>
+                  <span>{item.quantity}</span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => dispatch(increaseQuantity(item.id))}
+                  >
+                    +
+                  </Button>
+                </div>
+              </TableCell>
+
+              <TableCell className="text-center font-medium">
+                Rs {(item.price * USD_TO_PKR).toLocaleString()}
+              </TableCell>
+
+              <TableCell className="text-center font-bold">
+                Rs {(item.price * item.quantity * USD_TO_PKR).toLocaleString()}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
+      <Separator />
+
+      <div className="flex justify-between items-center">
+        <Button variant="link" asChild>
+          <Link href="/products">← Continue Shopping</Link>
+        </Button>
+
+        <div className="text-right">
+          <p className="text-lg font-bold">
+            Total: Rs {(total * USD_TO_PKR).toLocaleString()}
+          </p>
+          <Button asChild className="mt-2 bg-green-600 hover:bg-green-700">
+            <Link href="/checkout">Proceed to Checkout</Link>
+          </Button>
         </div>
-      ))}
-
-      <div className="mt-6 flex justify-between items-center">
-         <div className="text-right mt-6 font-bold text-xl">
-          Total: Rs {(total * USD_TO_PKR).toLocaleString()}
-        </div>
-        <Link
-          href="/checkout"
-          className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700"
-        >
-          Proceed to Checkout
-        </Link>
       </div>
     </div>
   );
